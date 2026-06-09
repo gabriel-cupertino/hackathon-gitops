@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ngo-db-init
+  namespace: ngo-service
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: psql
+          image: postgres:15-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              echo "Waiting for database..."
+              until pg_isready -h "$POSTGRES_HOST" -p "${POSTGRES_PORT:-5432}" -U "$POSTGRES_USER"; do
+                sleep 2
+              done
+              echo "Running init.sql..."
+              PGPASSWORD="$POSTGRES_PASSWORD" psql \
+                -h "$POSTGRES_HOST" \
+                -p "${POSTGRES_PORT:-5432}" \
+                -U "$POSTGRES_USER" \
+                -d "$POSTGRES_DB" \
+                -f /sql/init.sql
+              echo "Done."
+          volumeMounts:
+            - name: sql-volume
+              mountPath: /sql
+          envFrom:
+            - secretRef:
+                name: ngo-db-secret
+            - secretRef:
+                name: ngo-db-secret-host
+      volumes:
+        - name: sql-volume
+          configMap:
+            name: db-ngo-service-init-sql

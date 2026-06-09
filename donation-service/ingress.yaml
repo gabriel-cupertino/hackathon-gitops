@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: donation-service-ingress
+  namespace: donation-service
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /donation-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: app-donation-service
+                port:
+                  number: 8082

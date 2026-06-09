@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: volunteer-service-ingress
+  namespace: volunteer-service
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /volunteer-service(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: app-volunteer-service
+                port:
+                  number: 8083

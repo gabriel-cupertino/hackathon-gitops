@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: app-ngo-service
-          image: 834615370464.dkr.ecr.us-east-1.amazonaws.com/solidarytech_ngo-service:latest
+          image: 051688400625.dkr.ecr.us-east-1.amazonaws.com/solidarytech_ngo-service:8988e7df17c1e54e6a935fd872f340d355dabe3b
           imagePullPolicy: Always
           resources:
             requests:

@@ -4,16 +4,14 @@ metadata:
   name: volunteer-service-ingress
   namespace: volunteer-service
   annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/healthcheck-path: /health
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
-  ingressClassName: alb
+  ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /volunteer-service(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: app-volunteer-service

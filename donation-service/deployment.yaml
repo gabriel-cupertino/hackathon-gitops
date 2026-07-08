@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: app-donation-service
-          image: 051688400625.dkr.ecr.us-east-1.amazonaws.com/solidarytech_donation-service:9eceed366f2c6ee3824f14b655942e4935b1b2c3
+          image: 051688400625.dkr.ecr.us-east-1.amazonaws.com/solidarytech_donation-service:eabe2e2276817ad8e6573ef2c228a7145a4e1491
           imagePullPolicy: Always
           resources:
             requests:

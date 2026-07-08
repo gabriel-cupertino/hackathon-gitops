@@ -1,0 +1,423 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sre-donation-service-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  sre-donation-service.json: |
+    {
+      "title": "SRE — donation-service SLOs",
+      "uid": "solidarytech-sre-donation",
+      "tags": ["sre", "solidarytech", "donation-service", "slo"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "time": { "from": "now-24h", "to": "now" },
+      "refresh": "30s",
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "SLO Latência p99 < 300ms",
+          "description": "% das requisições respondidas em menos de 300ms. SLO: 99.9%",
+          "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "decimals": 3,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "yellow", "value": 0.995 },
+                  { "color": "green", "value": 0.999 }
+                ]
+              },
+              "mappings": []
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "1 - (sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~\".*donation.*\",le=\"0.3\"}[5m])) / sum(rate(nginx_ingress_controller_request_duration_seconds_count{ingress=~\".*donation.*\"}[5m])) < bool 1)",
+              "legendFormat": "SLO Latência",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "SLO Taxa de Sucesso (1 - Error Rate)",
+          "description": "% de requisições sem erro 5xx. SLO: 99.9%",
+          "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "decimals": 4,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "yellow", "value": 0.995 },
+                  { "color": "green", "value": 0.999 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "1 - (sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"5..\"}[5m])) / sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\"}[5m])))",
+              "legendFormat": "SLO Sucesso",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Error Budget Restante (30 dias)",
+          "description": "Budget disponível = 0.1% do total de requests no mês. 100% = intacto, 0% = esgotado.",
+          "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "decimals": 1,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "red", "value": null },
+                  { "color": "yellow", "value": 0.25 },
+                  { "color": "green", "value": 0.5 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "1 - clamp_min((sum(increase(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"5..\"}[30d])) / sum(increase(nginx_ingress_controller_requests{ingress=~\".*donation.*\"}[30d]))) / 0.001, 0)",
+              "legendFormat": "Budget Restante",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Throughput Atual",
+          "description": "Requisições por segundo no donation-service",
+          "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+          "options": {
+            "reduceOptions": { "calcs": ["lastNotNull"] },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "center"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "decimals": 2,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [{ "color": "blue", "value": null }]
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\"}[5m]))",
+              "legendFormat": "req/s",
+              "refId": "A",
+              "instant": true
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Latência — p50 / p95 / p99",
+          "description": "Linha vermelha tracejada = threshold SLO (300ms). Se p99 ultrapassar, SLO é violado.",
+          "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "none" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "s",
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "SLO threshold (300ms)" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+                  { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "histogram_quantile(0.50, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~\".*donation.*\"}[5m])) by (le))",
+              "legendFormat": "p50",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "histogram_quantile(0.95, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~\".*donation.*\"}[5m])) by (le))",
+              "legendFormat": "p95",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress=~\".*donation.*\"}[5m])) by (le))",
+              "legendFormat": "p99",
+              "refId": "C"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "vector(0.3)",
+              "legendFormat": "SLO threshold (300ms)",
+              "refId": "D"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Taxa de Erros 5xx",
+          "description": "Linha vermelha tracejada = threshold SLO (0.1%). Acima disso o Error Budget é consumido.",
+          "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "none" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 15
+              }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "SLO threshold (0.1%)" },
+                "properties": [
+                  { "id": "custom.lineStyle", "value": { "fill": "dash", "dash": [10, 10] } },
+                  { "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } },
+                  { "id": "custom.fillOpacity", "value": 0 }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Error Rate 5xx" },
+                "properties": [
+                  { "id": "color", "value": { "fixedColor": "orange", "mode": "fixed" } }
+                ]
+              }
+            ]
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"5..\"}[5m])) / sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\"}[5m]))",
+              "legendFormat": "Error Rate 5xx",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "vector(0.001)",
+              "legendFormat": "SLO threshold (0.1%)",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Error Budget Consumido — últimos 30 dias",
+          "description": "Mostra o burn rate do Error Budget. Quando chega a 100%, o SLO foi violado no período.",
+          "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+          "options": {
+            "tooltip": { "mode": "single" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "min": 0,
+              "max": 1,
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 20
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 0.5 },
+                  { "color": "red", "value": 1 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "clamp_max(clamp_min((sum(increase(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"5..\"}[30d])) / sum(increase(nginx_ingress_controller_requests{ingress=~\".*donation.*\"}[30d]))) / 0.001, 0), 1)",
+              "legendFormat": "Budget Consumido",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 8,
+          "type": "timeseries",
+          "title": "Throughput por Status Code",
+          "description": "Distribuição de requisições por código HTTP. 2xx = sucesso, 4xx = erro cliente, 5xx = erro servidor.",
+          "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+          "options": {
+            "tooltip": { "mode": "multi", "sort": "none" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "reqps",
+              "custom": {
+                "lineWidth": 2,
+                "fillOpacity": 10
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"2..\"}[5m]))",
+              "legendFormat": "2xx — Sucesso",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"4..\"}[5m]))",
+              "legendFormat": "4xx — Erro Cliente",
+              "refId": "B"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "sum(rate(nginx_ingress_controller_requests{ingress=~\".*donation.*\",status=~\"5..\"}[5m]))",
+              "legendFormat": "5xx — Erro Servidor",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "type": "timeseries",
+          "title": "Pods — donation-service",
+          "description": "Saúde dos pods: pods running vs desired. Queda indica instabilidade.",
+          "gridPos": { "x": 0, "y": 20, "w": 12, "h": 6 },
+          "options": {
+            "tooltip": { "mode": "multi" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "lineWidth": 2, "fillOpacity": 10 }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "kube_deployment_status_replicas_available{namespace=\"donation-service\", deployment=\"app-donation-service\"}",
+              "legendFormat": "Pods Available",
+              "refId": "A"
+            },
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "kube_deployment_spec_replicas{namespace=\"donation-service\", deployment=\"app-donation-service\"}",
+              "legendFormat": "Pods Desired",
+              "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "type": "timeseries",
+          "title": "Restart de Pods — donation-service",
+          "description": "Restarts frequentes indicam crashloop ou problema com variáveis de ambiente.",
+          "gridPos": { "x": 12, "y": 20, "w": 12, "h": 6 },
+          "options": {
+            "tooltip": { "mode": "single" },
+            "legend": { "displayMode": "list", "placement": "bottom" }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "custom": { "lineWidth": 2, "fillOpacity": 20 },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  { "color": "green", "value": null },
+                  { "color": "yellow", "value": 2 },
+                  { "color": "red", "value": 5 }
+                ]
+              }
+            }
+          },
+          "targets": [
+            {
+              "datasource": { "type": "prometheus" },
+              "expr": "increase(kube_pod_container_status_restarts_total{namespace=\"donation-service\"}[1h])",
+              "legendFormat": "Restarts/h — {{pod}}",
+              "refId": "A"
+            }
+          ]
+        }
+      ]
+    }

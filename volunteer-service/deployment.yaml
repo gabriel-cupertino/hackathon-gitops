@@ -60,3 +60,5 @@ spec:
           envFrom:
             - secretRef:
                 name: volunteer-db-secret-host
+            - secretRef:
+                name: aws-credentials

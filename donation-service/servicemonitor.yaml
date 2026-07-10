@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: donation-service-metrics
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - donation-service
+  selector:
+    matchLabels:
+      app: app-donation-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

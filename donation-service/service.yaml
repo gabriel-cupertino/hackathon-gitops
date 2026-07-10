@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: app-donation-service
   namespace: donation-service
+  labels:
+    app: app-donation-service
 spec:
   selector:
     app: app-donation-service

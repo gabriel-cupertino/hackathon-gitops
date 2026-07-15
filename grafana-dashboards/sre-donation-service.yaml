@@ -13,7 +13,7 @@ data:
       "tags": ["sre", "solidarytech", "donation-service", "slo"],
       "timezone": "browser",
       "schemaVersion": 39,
-      "time": { "from": "now-24h", "to": "now" },
+      "time": { "from": "now-6h", "to": "now" },
       "refresh": "30s",
       "panels": [
         {
@@ -100,7 +100,7 @@ data:
         {
           "id": 3,
           "type": "stat",
-          "title": "Error Budget Restante (30 dias)",
+          "title": "Error Budget Restante (4h)",
           "description": "Budget disponível = 0.1% do total de requests no mês. 100% = intacto, 0% = esgotado.",
           "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
           "options": {
@@ -130,7 +130,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "clamp_min(1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0), 0)",
+              "expr": "clamp_min(1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[4h]))) / 0.001, 0), 0)",
               "legendFormat": "Budget Restante",
               "refId": "A",
               "instant": true
@@ -280,7 +280,7 @@ data:
         {
           "id": 7,
           "type": "timeseries",
-          "title": "Error Budget — Burn Rate (janela 5m)",
+          "title": "Error Budget Consumido (4h)",
           "description": "Mostra o burn rate do Error Budget. Quando chega a 100%, o SLO foi violado no período.",
           "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
           "options": {
@@ -309,7 +309,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "clamp_max(((sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) or vector(0)) / sum(rate(donation_http_requests_total{path!=\"/health\"}[5m]))) / 0.001, 1)",
+              "expr": "clamp_max(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[4h]))) / 0.001, 1)",
               "legendFormat": "Budget Consumido",
               "refId": "A"
             }

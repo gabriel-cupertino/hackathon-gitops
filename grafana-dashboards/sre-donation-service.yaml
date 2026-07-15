@@ -130,7 +130,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0)",
+              "expr": "clamp_min(1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0), 0)",
               "legendFormat": "Budget Restante",
               "refId": "A",
               "instant": true
@@ -280,7 +280,7 @@ data:
         {
           "id": 7,
           "type": "timeseries",
-          "title": "Error Budget Consumido — últimos 30 dias",
+          "title": "Error Budget — Burn Rate (janela 5m)",
           "description": "Mostra o burn rate do Error Budget. Quando chega a 100%, o SLO foi violado no período.",
           "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
           "options": {
@@ -309,7 +309,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "clamp_max(clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0), 1)",
+              "expr": "clamp_max(((sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) or vector(0)) / sum(rate(donation_http_requests_total{path!=\"/health\"}[5m]))) / 0.001, 1)",
               "legendFormat": "Budget Consumido",
               "refId": "A"
             }

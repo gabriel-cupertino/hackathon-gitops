@@ -49,7 +49,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\",le=\"0.3\"}[5m])) / sum(rate(donation_http_request_duration_seconds_count{path!=\"/health\"}[5m]))",
               "legendFormat": "SLO Latência",
               "refId": "A",
@@ -89,7 +89,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "1 - (sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) / sum(rate(donation_http_requests_total{path!=\"/health\"}[5m])))",
               "legendFormat": "SLO Sucesso",
               "refId": "A",
@@ -129,7 +129,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "1 - clamp_min((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0)",
               "legendFormat": "Budget Restante",
               "refId": "A",
@@ -163,7 +163,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_requests_total{path!=\"/health\"}[5m]))",
               "legendFormat": "req/s",
               "refId": "A",
@@ -202,25 +202,25 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "histogram_quantile(0.50, sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\"}[5m])) by (le))",
               "legendFormat": "p50",
               "refId": "A"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "histogram_quantile(0.95, sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\"}[5m])) by (le))",
               "legendFormat": "p95",
               "refId": "B"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "histogram_quantile(0.99, sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\"}[5m])) by (le))",
               "legendFormat": "p99",
               "refId": "C"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "vector(0.3)",
               "legendFormat": "SLO threshold (300ms)",
               "refId": "D"
@@ -264,13 +264,13 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) / sum(rate(donation_http_requests_total{path!=\"/health\"}[5m]))",
               "legendFormat": "Error Rate 5xx",
               "refId": "A"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "vector(0.001)",
               "legendFormat": "SLO threshold (0.1%)",
               "refId": "B"
@@ -308,7 +308,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "clamp_max(clamp_min((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[30d])) / sum(increase(donation_http_requests_total{path!=\"/health\"}[30d]))) / 0.001, 0), 1)",
               "legendFormat": "Budget Consumido",
               "refId": "A"
@@ -336,19 +336,19 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_requests_total{status=~\"2..\"}[5m])) by (path)",
               "legendFormat": "2xx — {{path}}",
               "refId": "A"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_requests_total{status=~\"4..\"}[5m])) by (path)",
               "legendFormat": "4xx — {{path}}",
               "refId": "B"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "sum(rate(donation_http_requests_total{status=~\"5..\"}[5m])) by (path)",
               "legendFormat": "5xx — {{path}}",
               "refId": "C"
@@ -373,13 +373,13 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "kube_deployment_status_replicas_available{namespace=\"donation-service\", deployment=\"app-donation-service\"}",
               "legendFormat": "Pods Available",
               "refId": "A"
             },
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "kube_deployment_spec_replicas{namespace=\"donation-service\", deployment=\"app-donation-service\"}",
               "legendFormat": "Pods Desired",
               "refId": "B"
@@ -412,7 +412,7 @@ data:
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus" },
+              "datasource": { "type": "prometheus", "uid": "prometheus" },
               "expr": "increase(kube_pod_container_status_restarts_total{namespace=\"donation-service\"}[1h])",
               "legendFormat": "Restarts/h — {{pod}}",
               "refId": "A"

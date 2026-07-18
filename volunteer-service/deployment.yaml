@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: app-volunteer-service
-          image: 051688400625.dkr.ecr.us-east-1.amazonaws.com/solidarytech_volunteer-service:eed3073b71d7023c1a80c5ceaff0a4607efce253
+          image: 051688400625.dkr.ecr.us-east-1.amazonaws.com/solidarytech_volunteer-service:b878cd7071f7c461a483bb08a49603864b29a7e6
           imagePullPolicy: Always
           resources:
             requests:

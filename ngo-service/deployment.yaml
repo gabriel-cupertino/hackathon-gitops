@@ -10,7 +10,7 @@ spec:
     rollingUpdate:
       maxSurge: 50%
       maxUnavailable: 0
-  replicas: 1
+  # replicas gerenciado pelo HPA — NÃO declarar aqui (evita conflito com ArgoCD selfHeal)
   selector:
     matchLabels:
       app: app-ngo-service
@@ -26,7 +26,7 @@ spec:
           resources:
             requests:
               cpu: "100m"
-              memory: "128Mi"
+              memory: "160Mi"
             limits:
               cpu: "500m"
               memory: "256Mi"

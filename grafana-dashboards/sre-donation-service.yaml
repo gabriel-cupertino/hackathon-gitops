@@ -50,7 +50,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "(sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\",le=\"0.3\"}[5m])) / sum(rate(donation_http_request_duration_seconds_count{path!=\"/health\"}[5m]))) or vector(1)",
+              "expr": "(sum(rate(donation_http_request_duration_seconds_bucket{path!=\"/health\",le=\"0.3\"}[5m])) / (sum(rate(donation_http_request_duration_seconds_count{path!=\"/health\"}[5m])) > 0)) or vector(1)",
               "legendFormat": "SLO Latência",
               "refId": "A",
               "instant": true
@@ -90,7 +90,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "(1 - ((sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) or vector(0)) / sum(rate(donation_http_requests_total{path!=\"/health\"}[5m])))) or vector(1)",
+              "expr": "(1 - ((sum(rate(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[5m])) or vector(0)) / (sum(rate(donation_http_requests_total{path!=\"/health\"}[5m])) > 0))) or vector(1)",
               "legendFormat": "SLO Sucesso",
               "refId": "A",
               "instant": true

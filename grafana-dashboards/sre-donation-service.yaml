@@ -130,7 +130,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "clamp_min(1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[4h]))) / 0.001, 0), 0)",
+              "expr": "(clamp_min(1 - clamp_min(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / (sum(increase(donation_http_requests_total{path!=\"/health\"}[4h])) > 0)) / 0.001, 0), 0)) or vector(1)",
               "legendFormat": "Budget Restante",
               "refId": "A",
               "instant": true
@@ -311,7 +311,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus" },
-              "expr": "clamp_max(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / sum(increase(donation_http_requests_total{path!=\"/health\"}[4h]))) / 0.001, 1)",
+              "expr": "(clamp_max(((sum(increase(donation_http_requests_total{path!=\"/health\",status=~\"5..\"}[4h])) or vector(0)) / (sum(increase(donation_http_requests_total{path!=\"/health\"}[4h])) > 0)) / 0.001, 1)) or vector(0)",
               "legendFormat": "Budget Consumido",
               "refId": "A"
             }
